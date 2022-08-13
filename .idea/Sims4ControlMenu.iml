@@ -13,7 +13,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Libraries/S4CL" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/Release" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.7 (Sims4ControlMenu)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TestRunnerService">

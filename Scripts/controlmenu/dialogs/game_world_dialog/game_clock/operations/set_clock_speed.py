@@ -20,6 +20,7 @@ from controlmenu.enums.string_identifiers import CMStringId
 from controlmenu.logging.has_cm_log import HasCMLog
 from controlmenu.persistence.cm_data_manager_utils import CMMainDataManagerUtils
 from controlmenu.settings.settings import CMSetting
+from controlmenu.commonlib.utils.time_utils import CMTimeUtils
 
 
 class CMSetClockSpeedOp(HasCMLog):
@@ -39,6 +40,7 @@ class CMSetClockSpeedOp(HasCMLog):
                 on_completed(True)
                 return
             date_and_time.REAL_MILLISECONDS_PER_SIM_SECOND = setting_value
+            CMTimeUtils.compute_second_per_period(setting_value)
             data_store.set_value_by_key(setting_name, setting_value)
             on_completed(True)
 
