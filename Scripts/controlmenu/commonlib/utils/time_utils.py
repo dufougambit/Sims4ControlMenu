@@ -6,6 +6,10 @@ https://creativecommons.org/licenses/by/4.0/legalcode
 Copyright (c) COLONOLNUTTY
 """
 import date_and_time
+from sims4communitylib.utils.common_time_utils import CommonTimeUtils
+import sims4
+from scheduler import ScheduleEntry
+import services
 
 
 class CMTimeUtils:
@@ -16,10 +20,31 @@ class CMTimeUtils:
     EA_SECONDS_PER_WEEK = EA_SECONDS_PER_DAY * 7
 
     @classmethod
-    def compute_second_per_period(cls, real_milliseconds_per_sim_second):
-        ratio = cls.EA_REAL_MILLISECONDS_PER_SIM_SECOND / real_milliseconds_per_sim_second
-        date_and_time.SECONDS_PER_MINUTE = cls.EA_SECONDS_PER_MINUTE // ratio
-        date_and_time.SECONDS_PER_HOUR = cls.EA_SECONDS_PER_HOUR // ratio
-        date_and_time.SECONDS_PER_DAY = cls.EA_SECONDS_PER_DAY // ratio
-        date_and_time.SECONDS_PER_WEEK = cls.EA_SECONDS_PER_WEEK // ratio
+    def compute_second_per_period(cls, new_real_milliseconds_per_sim_second):
 
+        """
+        with sims4.reload.protected(globals()):
+            # date_and_time.TICKS_PER_REAL_WORLD_SECOND = 1000
+            date_and_time.REAL_MILLISECONDS_PER_SIM_SECOND = real_milliseconds_per_sim_second
+        """
+
+        real_milliseconds_per_sim_second = date_and_time.REAL_MILLISECONDS_PER_SIM_SECOND
+
+        date_and_time.REAL_MILLISECONDS_PER_SIM_SECOND = new_real_milliseconds_per_sim_second
+        ScheduleEntry.FACTORY_TUNABLES['start_time']._default = date_and_time.create_date_and_time(hours=9, minutes=0)
+
+        absolute_ticks = services.server_clock_service().ticks()
+        new_ticks = absolute_ticks * new_real_milliseconds_per_sim_second // real_milliseconds_per_sim_second
+
+        if new_real_milliseconds_per_sim_second < real_milliseconds_per_sim_second:
+            time_delta = date_and_time.TimeSpan(new_ticks - absolute_ticks)
+            delta_seconds = time_delta.in_seconds()
+            sims4.commands.execute(f'clock.advance_game_time 0 0 {delta_seconds}', None)
+
+        sims4.commands.execute('clock._set_milliseconds_per_sim_second {0}'.format(new_real_milliseconds_per_sim_second),
+                               None)
+
+        if new_real_milliseconds_per_sim_second > real_milliseconds_per_sim_second:
+            time_delta = date_and_time.TimeSpan(absolute_ticks - new_ticks)
+            delta_seconds = time_delta.in_seconds()
+            sims4.commands.execute(f'clock.advance_game_time 0 0 {delta_seconds}', None)

@@ -21,10 +21,12 @@ from controlmenu.logging.has_cm_log import HasCMLog
 from controlmenu.persistence.cm_data_manager_utils import CMMainDataManagerUtils
 from controlmenu.settings.settings import CMSetting
 from controlmenu.commonlib.utils.time_utils import CMTimeUtils
-
+from scheduler import ScheduleEntry
+import sims4
 
 class CMSetClockSpeedOp(HasCMLog):
     """Set the clock speed for the Game Clock."""
+    _DEFAULT_REAL_MILLISECONDS_PER_SIM_SECOND = 25
     _DEFAULT_CLOCK_SPEED_MIN = 1
     _DEFAULT_CLOCK_SPEED_MAX = 9999
 
@@ -39,7 +41,6 @@ class CMSetClockSpeedOp(HasCMLog):
             if setting_value is None or CommonChoiceOutcome.is_error_or_cancel(outcome):
                 on_completed(True)
                 return
-            date_and_time.REAL_MILLISECONDS_PER_SIM_SECOND = setting_value
             CMTimeUtils.compute_second_per_period(setting_value)
             data_store.set_value_by_key(setting_name, setting_value)
             on_completed(True)
@@ -63,7 +64,7 @@ class CMSetClockSpeedOp(HasCMLog):
                     CommonLocalizationUtils.create_localized_string(
                         CMStringId.DEFAULT_MIN_MAX,
                         tokens=(
-                            str(data_store.get_default_value_by_key(CMSetting.REAL_MILLISECONDS_PER_SIM_SECOND)),
+                            str(CMSetClockSpeedOp._DEFAULT_REAL_MILLISECONDS_PER_SIM_SECOND),
                             str(CMSetClockSpeedOp._DEFAULT_CLOCK_SPEED_MIN),
                             str(CMSetClockSpeedOp._DEFAULT_CLOCK_SPEED_MAX)
                         )
