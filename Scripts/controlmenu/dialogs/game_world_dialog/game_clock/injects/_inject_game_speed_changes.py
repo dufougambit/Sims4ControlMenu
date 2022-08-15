@@ -20,7 +20,8 @@ from controlmenu.commonlib.utils.time_utils import CMTimeUtils
 @CommonInjectionUtils.inject_safely_into(ModInfo.get_identity(), sims4.core_services, 'start_services')
 def _cm_adjust_game_clock_on_zone_load(original, self, *_, **__) -> Any:
     original_result = original(self, *_, **__)
-    CMTimeUtils().compute_second_per_period(CMSettingUtils.get_real_milliseconds_per_sim_second())
+    CMTimeUtils().adjust_game_clock(CMTimeUtils.EA_REAL_MILLISECONDS_PER_SIM_SECOND,
+                                    CMSettingUtils.get_real_milliseconds_per_sim_second())
     return original_result
 
 

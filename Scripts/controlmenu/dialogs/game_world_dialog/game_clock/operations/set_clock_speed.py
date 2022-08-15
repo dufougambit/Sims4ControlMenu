@@ -41,7 +41,8 @@ class CMSetClockSpeedOp(HasCMLog):
             if setting_value is None or CommonChoiceOutcome.is_error_or_cancel(outcome):
                 on_completed(True)
                 return
-            CMTimeUtils().compute_second_per_period(setting_value)
+            old_value = data_store.get_value_by_key(CMSetting.REAL_MILLISECONDS_PER_SIM_SECOND)
+            CMTimeUtils().adjust_game_clock(old_value, setting_value)
             data_store.set_value_by_key(setting_name, setting_value)
             on_completed(True)
 
